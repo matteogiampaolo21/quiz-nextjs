@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 input{
-    background-color: #aaa;
+    background-color: #ccc;
 }
 body{
     margin: 0 50px;
