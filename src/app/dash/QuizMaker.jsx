@@ -1,5 +1,7 @@
 'use client'
 import { useState } from "react"
+import { auth, db } from "@/firebase/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 export const QuizMaker = () => {
     const [questions,setQuestions] = useState([]);
@@ -10,6 +12,7 @@ export const QuizMaker = () => {
 
     const addQuestion = (e) => {
         e.preventDefault();
+
 
         const fullQuestion = {
             question:questionInput,
@@ -29,16 +32,35 @@ export const QuizMaker = () => {
         tempArr[editedQuestion.currentIndex] = editedQuestion;
         setQuestions(tempArr)
 
-        
+    }
 
+    const completeQuiz = async () => {
+        console.log(questions,auth.currentUser.uid)
+        const docRef = await addDoc(collection(db, "quizzes"), {
+            // Add the quiz
+            questions:questions,
+            creator:auth.currentUser.uid,
+        });
+        console.log("Document written with ID: ", docRef.id);
+        setQuestions([]);
+        setEdit({})
     }
 
     return(
         
-        <main className="flex flex-row justify-start gap-9">
+        <section className="flex flex-row w-max justify-start gap-9">
             <aside className="flex flex-col h-max border-black border-2">
-                {questions.length == 0 ? <p>No questions here.</p> : <></>}
-                {questions.map((question,index) => <button onClick={() => {question.currentIndex = index; setEdit(question); console.log(question)}} className="hover:bg-neutral-300 w-36 border-b" key={index}>{index+1}</button>)}
+                {questions.map((question,index) => 
+                    <button 
+                        onClick={() => {question.currentIndex = index; setEdit(question); console.log(question)}} 
+                        className="hover:bg-neutral-300 w-36 border-b" 
+                        key={index}>
+                        {index+1}
+                    </button>
+                )}
+                {questions.length == 0 ? <p>No questions here.</p> :
+                    <button onClick={completeQuiz} className="bg-emerald-300 hover:bg-emerald-400 border-t-2 border-black">Complete Quiz</button>
+                }
             </aside>
             <form className="col-span-4 flex flex-col h-max gap-3 border-black border-2 w-max p-2">
                 <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Question" value={questionInput} onChange={(e) => setInput(e.target.value)} type="text" />
@@ -58,6 +80,6 @@ export const QuizMaker = () => {
                 </form>  
             }
 
-        </main>
+        </section>
     )
 }

@@ -3,7 +3,9 @@ const Page = () => {
     return(
         <>
             <h1 className="text-3xl">Dash</h1>
-            <QuizMaker/>
+            <div className="flex flex-row gap-5">
+                <QuizMaker/>
+            </div>
         </>
     )
 }
