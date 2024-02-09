@@ -1,10 +1,16 @@
 import { QuizMaker } from "./QuizMaker";
+import { QuizFinder } from "./QuizFinder";
 const Page = () => {
     return(
         <>
-            <h1 className="text-3xl">Dash</h1>
+            <div className="my-5">
+                <h1 className="text-3xl">Dash</h1>
+                <p>Create Quizzes and complete them!</p>
+
+            </div>
             <div className="flex flex-row gap-5">
-                <QuizMaker/>
+                <QuizMaker />
+                <QuizFinder />
             </div>
         </>
     )
