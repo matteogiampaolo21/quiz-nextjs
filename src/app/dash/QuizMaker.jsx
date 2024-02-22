@@ -5,10 +5,15 @@ import { collection, addDoc } from "firebase/firestore";
 
 export const QuizMaker = () => {
     const [questions,setQuestions] = useState([]);
+    
     const [title, setTitle] = useState("")
     const [tags, setTags] = useState("")
     const [questionInput, setInput] = useState("");
     const [answer1, setAnswer1] = useState("");
+    const [answer2, setAnswer2] = useState("");
+    const [answer3, setAnswer3] = useState("");
+    const [answer4, setAnswer4] = useState("");
+    
     const [editedQuestion, setEdit] = useState({})
     // console.log(questions)
 
@@ -18,12 +23,21 @@ export const QuizMaker = () => {
 
         const fullQuestion = {
             question:questionInput,
-            correctAnswer:answer1,
+            answers:[
+                {text:answer1,isCorrect:true},
+                {text:answer2,isCorrect:false},
+                {text:answer3,isCorrect:false},
+                {text:answer4,isCorrect:false}
+            ]
         }
         setQuestions((prev) => ([...prev,fullQuestion]))
 
-        setInput("")
-        setAnswer1("")
+        setInput("");
+        setAnswer1("");
+        setAnswer2('');
+        setAnswer3('');
+        setAnswer4('');
+
     }
 
     const handleEdit = (e) => {
@@ -52,6 +66,22 @@ export const QuizMaker = () => {
         setEdit({})
     }
 
+
+    const handleEditAnswer = (e,num) => {
+        console.log(e,num)
+        const editedAnswer = editedQuestion.answers.map((answer,index) => {
+            if ( index !== num) {
+                return answer;
+            }else{
+                // console.log(answer.text, e.target.value)
+                answer.text = e.target.value;
+                return answer
+            }
+        })
+        console.log(editedAnswer)
+        setEdit(prev => ({...prev, answers: editedAnswer}))
+    }
+
     return(
         
         <section className="flex flex-col w-max justify-start gap-9">
@@ -72,7 +102,10 @@ export const QuizMaker = () => {
             </aside>
             <form className="col-span-4 flex flex-col h-max gap-3 border-black border-2 w-max p-2">
                 <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Question" value={questionInput} onChange={(e) => setInput(e.target.value)} type="text" />
-                <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Answer 1" value={answer1} onChange={(e) => setAnswer1(e.target.value)} type="text" />
+                <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Correct Answer" value={answer1} onChange={(e) => setAnswer1(e.target.value)} type="text" />
+                <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={answer2} onChange={(e) => setAnswer2(e.target.value)} type="text" />
+                <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={answer3} onChange={(e) => setAnswer3(e.target.value)} type="text" />
+                <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={answer4} onChange={(e) => setAnswer4(e.target.value)} type="text" />
                 <button onClick={(e) => addQuestion(e)} className="border-black w-full border-2 px-3">Add Question</button>
             </form>
 
@@ -83,7 +116,10 @@ export const QuizMaker = () => {
                 <form className="col-span-4 flex flex-col gap-3 border-black border-2 w-max p-2">
                     <button className="ml-auto " onClick={() => {setEdit({})}}>Hide</button>
                     <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Question" value={editedQuestion.question} onChange={(e) => setEdit(prev => ({...prev, question: e.target.value}))} type="text" />
-                    <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Answer 1" value={editedQuestion.correctAnswer} onChange={(e) => setEdit(prev => ({...prev, correctAnswer: e.target.value}))} type="text" />
+                    <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Correct Answer" value={editedQuestion.answers[0].text} onChange={(e) => handleEditAnswer(e,0)} type="text" />
+                    <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={editedQuestion.answers[1].text} onChange={(e) => handleEditAnswer(e,1)} type="text" />
+                    <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={editedQuestion.answers[2].text} onChange={(e) => handleEditAnswer(e,2)} type="text" />
+                    <input className="p-0 placeholder:text-neutral-600 px-2" placeholder="Incorrect Answer" value={editedQuestion.answers[3].text} onChange={(e) => handleEditAnswer(e,3)} type="text" />
                     <button onClick={(e) => handleEdit(e)} className="border-black w-full border-2 px-3">Edit Question</button>
                 </form>  
             }
