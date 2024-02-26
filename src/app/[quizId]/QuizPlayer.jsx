@@ -29,18 +29,21 @@ export const QuizPlayer = () => {
         
     },[])
 
-    const checkAnswer = (e) => {
+    const checkAnswer = (e,isCorrect) => {
 
         // for (const btn of document.getElementsByTagName("button")){
         //     console.log(btn.disabled = false)
         // }
-        if (counter < quiz.questions.length -1 ) {
+        if(!isCorrect){
+            e.currentTarget.disabled = true;
+        }
+        else if (counter < quiz.questions.length -1 && isCorrect) {
             // setCounter(counter+1);
             setDisabled(false);
             e.currentTarget.disabled = true
 
-        }else{
-            console.log("Last question")
+        }else if (counter === quiz.questions.length -1 && isCorrect){
+            console.log("Last question and Correct");
         }
     }
 
@@ -57,9 +60,10 @@ export const QuizPlayer = () => {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
-        }
+        };
+        return array
     }
-
+    
     // const handleWrongAnswer = (e) => {
     //     checkAnswer(false);
     //     e.currentTarget.disabled = true;
@@ -74,10 +78,13 @@ export const QuizPlayer = () => {
                         <p className="text-xl mb-3">{quiz.questions[counter].question}</p>
                         <p className="text-xl mb-3 text-right">Question {counter+1}</p>
                         <div className="grid grid-cols-2 gap-1 col-span-2">
-                            <button onClick={(e) => {checkAnswer(e)}} className="border-black border-2 p-2 disabled:bg-green-500 hover:bg-neutral-200">{quiz.questions[counter].correctAnswer}</button>
-                            <button onClick={(e) => {e.currentTarget.disabled = true;}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">Incorrect Answer 1</button>
-                            <button onClick={(e) => {e.currentTarget.disabled = true;}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">Incorrect Answer 2</button>
-                            <button onClick={(e) => {e.currentTarget.disabled = true;}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">Incorrect Answer 3</button>
+                            {shuffleArray(quiz.questions[counter].answers).map((answer,index) => 
+                                <button key={index} onClick={(e) => {checkAnswer(e,answer.isCorrect)}} className={`border-black border-2 p-2 ${answer.isCorrect ? "disabled:bg-green-500" : "disabled:bg-red-500"} hover:bg-neutral-200`}>{answer.text}</button>
+                            )}
+                            {/* <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[0].isCorrect)}} className="border-black border-2 p-2 disabled:bg-green-500 hover:bg-neutral-200">{quiz.questions[counter].answers[0].text}</button>
+                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[1].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[1].text}</button>
+                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[2].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[2].text}</button>
+                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[3].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[3].text}</button> */}
                         </div>
                         <button id="Next-btn" disabled={isNextBtnDisalbled} onClick={nextQuestion} className="border-black disabled:border-neutral-500 disabled:text-neutral-600 disabled:bg-neutral-300 mt-1 w-max col-span-2 ml-auto border-2 p-2 hover:bg-neutral-200">Next Question</button>
                     </article>

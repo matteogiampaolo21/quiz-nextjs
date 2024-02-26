@@ -34,7 +34,7 @@ export const QuizFinder = () => {
         <main className="flex flex-col border-black border-2 p-2 w-max">
             <h3 className=" text-xl">Search for a quiz:</h3>
             <form className="grid grid-cols-12 mb-5 w-max justify-around">
-                <input value={tags} onChange={(e) => {setTags(e.target.value)}} type="text" className="placeholder:text-neutral-600 col-span-10 text-neutral-600 px-2" placeholder="Search with Tags!" />
+                <input value={tags} onChange={(e) => {setTags(e.target.value)}} type="text" className="placeholder:text-neutral-600 col-span-10 text-black px-2" placeholder="Search with Tags!" />
                 <button onClick={(e) => {handleSearch(e)}} className="border-black hover:bg-neutral-300 col-span-2 w-max px-2 ml-auto border-2">O</button>
             </form>
             {quizzes.length > 0 ?
