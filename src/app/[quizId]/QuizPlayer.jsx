@@ -5,41 +5,58 @@ import { db } from "@/firebase/firebase";
 import { useEffect, useState } from "react";
 
 export const QuizPlayer = () => {
+    // Get Parameters
     const params = useParams();
+
+    // Set the requested Quiz
     const [quiz,setQuiz] = useState(null);
+
+    // Set the shuffled questions
+    const [shuffledQuestions, setShuffle] = useState([])
+
+    // Keep track of which question user is on
     const [counter,setCounter] = useState(0);
-    const [isNextBtnDisalbled,setDisabled] = useState(true)
 
+    // Keep track if user is able to continue to next question
+    const [isNextBtnDisalbled,setNextBtnDisabled] = useState(true)
 
+    //Keep track of users score 
+    const [score,setScore] = useState(0);
+
+    
+    // Get quiz from database
     const getQuiz = async () => {
         const docRef = doc(db, "quizzes", params.quizId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
+            // console.log("Document data:", docSnap.data());
             setQuiz(docSnap.data());
+            setShuffle(shuffleArray(docSnap.data().questions[counter].answers))
         } else {
             // docSnap.data() will be undefined in this case
             console.log("No such document!");
         }
     }
 
+
     useEffect(() => {
         getQuiz();
-        
     },[])
 
+
+    // Check if the clicked option is correct, last question, and increase score.
     const checkAnswer = (e,isCorrect) => {
 
-        // for (const btn of document.getElementsByTagName("button")){
-        //     console.log(btn.disabled = false)
-        // }
         if(!isCorrect){
-            e.currentTarget.disabled = true;
+            Array.from(document.getElementsByClassName("option-btn")).forEach((btn) => {
+                btn.disabled = true;
+                setNextBtnDisabled(false)
+            })
         }
         else if (counter < quiz.questions.length -1 && isCorrect) {
             // setCounter(counter+1);
-            setDisabled(false);
+            setNextBtnDisabled(false);
             e.currentTarget.disabled = true
 
         }else if (counter === quiz.questions.length -1 && isCorrect){
@@ -52,8 +69,9 @@ export const QuizPlayer = () => {
         for (const btn of document.getElementsByTagName("button")){
             console.log(btn.disabled = false)
         }
+        setShuffle(shuffleArray(quiz.questions[counter +1].answers))
         setCounter(counter+1);
-        setDisabled(true)
+        setNextBtnDisabled(true)
     }
 
     function shuffleArray(array) {
@@ -69,6 +87,7 @@ export const QuizPlayer = () => {
     //     e.currentTarget.disabled = true;
     // }
 
+
     return(
         <section>
             {quiz ?
@@ -78,13 +97,9 @@ export const QuizPlayer = () => {
                         <p className="text-xl mb-3">{quiz.questions[counter].question}</p>
                         <p className="text-xl mb-3 text-right">Question {counter+1}</p>
                         <div className="grid grid-cols-2 gap-1 col-span-2">
-                            {shuffleArray(quiz.questions[counter].answers).map((answer,index) => 
-                                <button key={index} onClick={(e) => {checkAnswer(e,answer.isCorrect)}} className={`border-black border-2 p-2 ${answer.isCorrect ? "disabled:bg-green-500" : "disabled:bg-red-500"} hover:bg-neutral-200`}>{answer.text}</button>
+                            {shuffledQuestions.map((answer,index) => 
+                                <button key={index} onClick={(e) => {checkAnswer(e,answer.isCorrect)}} className={`option-btn border-black border-2 p-2 ${answer.isCorrect ? "disabled:bg-green-500" : "disabled:bg-red-500"} hover:bg-neutral-200`}>{answer.text}</button>
                             )}
-                            {/* <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[0].isCorrect)}} className="border-black border-2 p-2 disabled:bg-green-500 hover:bg-neutral-200">{quiz.questions[counter].answers[0].text}</button>
-                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[1].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[1].text}</button>
-                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[2].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[2].text}</button>
-                            <button onClick={(e) => {checkAnswer(e,quiz.questions[counter].answers[3].isCorrect)}} className="border-black disabled:bg-red-500 border-2 p-2 hover:bg-neutral-200">{quiz.questions[counter].answers[3].text}</button> */}
                         </div>
                         <button id="Next-btn" disabled={isNextBtnDisalbled} onClick={nextQuestion} className="border-black disabled:border-neutral-500 disabled:text-neutral-600 disabled:bg-neutral-300 mt-1 w-max col-span-2 ml-auto border-2 p-2 hover:bg-neutral-200">Next Question</button>
                     </article>
